@@ -15,24 +15,29 @@
 #include <QSplitter>
 #include <QScrollArea>
 #include <QLabel>
+#include <QTableView>
 
+#include "photosmodel.h"
 #include "photoviewer.h"
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+public:
+    MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+
 private:
+    PhotosModel* _model;
     PhotoViewer* photoViewer;
+    QTableView* tableView;
 
     void initializeMenu();
     void initializeToolBar();
     void initializeMainWindow();
     void initializeStatusBar();
 
-public:
-    MainWindow(QWidget *parent = 0);
-    ~MainWindow();
 
 public slots:
     void exit() const;

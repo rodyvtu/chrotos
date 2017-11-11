@@ -14,7 +14,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    photoviewer.cpp
+    photoviewer.cpp \
+    photosmodel.cpp
 
 HEADERS  += mainwindow.h \
-    photoviewer.h
+    photoviewer.h \
+    photosmodel.h

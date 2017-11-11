@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Resize to 70% of the desktop size
     resize(desktopDimension*0.7);
 
+    _model = new PhotosModel();
+
     // Set up the widgets
     initializeMenu();
     initializeToolBar();
@@ -74,6 +76,12 @@ void MainWindow::initializeMainWindow()
     // Some content
     QScrollArea* filesScrollArea = new QScrollArea(this);
     filesScrollArea->setMinimumWidth(200);
+
+    // QUICK AND DIRTY ADD LISTVIEW
+    tableView = new QTableView(this);
+    tableView->setModel(_model);
+    filesScrollArea->setWidget(tableView);
+
     photoViewer = new PhotoViewer(this);
     QScrollArea* thumbnailsScrollArea = new QScrollArea(this);
     thumbnailsScrollArea->setMinimumHeight(200);
