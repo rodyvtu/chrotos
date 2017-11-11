@@ -3,66 +3,79 @@
 PhotoViewer::PhotoViewer(QWidget *parent) :
     QWidget(parent)
 {
-
+    // Set up the image
+    _image = new QImage();
 
     // Set up image label
-    imageLabel = new QLabel(this);
-    imageLabel->setBackgroundRole(QPalette::Base);
-    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    imageLabel->setScaledContents(true);
+    _imageLabel = new QLabel(this);
+    _imageLabel->setBackgroundRole(QPalette::Base);
+    _imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    _imageLabel->setScaledContents(true);
 
-    // Set up scroll area
-    imageScrollArea = new QScrollArea(this);
-    imageScrollArea->setBackgroundRole(QPalette::Dark);
-    imageScrollArea->setVisible(false);
-    imageScrollArea->setWidget(imageLabel);
+    // Set up the button
+    _button = new QPushButton();
+    _button->setText(tr("Open an image"));
+
+    // Set up the layout
+    _layout = new QVBoxLayout(this);
+    _layout->addWidget(_imageLabel);
+    _layout->addWidget(_button);
 
     // Scale the picture with factor
-    scalefactor = 1.0;
-
+    _scaleFactor = 1.0;
 
     // Create actions
     createActions();
 
-    // Load Image
-    QPixmap pixmap;
-    QString fileName("/home/rody/Pictures/wallpapers/2017-04-28.jpg");
+    setLayout(_layout);
+}
 
-    // Set-up scroll area (prevents overflow)
-
-    // Read an image
-    QImageReader imageReader(fileName);
-    imageReader.setAutoTransform(true); // Take portrait mode in account for JPEG images
-
-    if(imageReader.read(image)){
-        QString msg = tr("Cannot load %1: %2").arg(fileName, imageReader.errorString());
-        QMessageBox::information(this, "Chroto", msg);
-    }
-
-    // Add to layout
-    layout->addWidget(scrollArea);
-    setLayout(layout);
+PhotoViewer::~PhotoViewer()
+{
 }
 
 
-PhotoViewer::createActions()
+void PhotoViewer::createActions()
 {
-    qDebug() << "Create the actions" << endl;
+    // Bind the hotkeys etc.
+    connect( _button, SIGNAL(clicked(bool)),
+             this, SLOT(openFile()) );
 }
 
 bool PhotoViewer::loadFile(const QString &fileName)
 {
+    QImageReader imageReader;
+    QString msg;
+    QPixmap pixmap;
+    QSize labelSize = _imageLabel->size();
 
-    QImageReader reader(fileName);
-    reader.setAutoTransform(true);
-    const QImage newImage = reader.read();
-    if (newImage.isNull()) {
-        QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
-                                 tr("Cannot load %1: %2")
-                                 .arg(QDir::toNativeSeparators(fileName), reader.errorString()));
-        return false;
+    // Read image
+    imageReader.setFileName(fileName);
+    imageReader.setAutoTransform(true); // Take portrait mode in account for JPEG images
+
+    // Check if succesful
+    if(!imageReader.read(_image)){
+        msg = tr("Cannot load \"%1\".<br /> %2");
+        msg = msg.arg(fileName, imageReader.errorString());
+        QMessageBox::information(this, "Chroto", msg);
     }
 
-PhotoViewer::~PhotoViewer()
+    // Show the image
+    pixmap = QPixmap::fromImage(*_image);
+    qDebug() << "Label size: " << labelSize << endl;
+    _imageLabel->setPixmap(pixmap);
+}
+
+
+void PhotoViewer::openFile()
 {
+    // Get the file
+    QString fileName = QFileDialog::getOpenFileName(
+                          this,
+                          tr("Open Image"),
+                          QString(),
+                          tr("Image Files (*.png *.jpg *.bmp)")
+                        );
+    // Load the file
+    loadFile(fileName);
 }
