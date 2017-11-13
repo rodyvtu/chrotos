@@ -2,7 +2,8 @@
 
 PhotosModel::PhotosModel(QObject *parent) : QAbstractTableModel()
 {
-
+    Photo photo;
+    _data.append(photo);
 }
 
 int PhotosModel::columnCount(const QModelIndex &parent) const
@@ -34,24 +35,40 @@ QVariant PhotosModel::data(const QModelIndex &index, int role) const
 
 QVariant PhotosModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    QString txt;
     QString name;
     QVariant data;
 
     if(role == Qt::DisplayRole)
     {
         if(orientation == Qt::Horizontal){
-            name = "Col. ";
+            switch(section)
+            {
+                case 0:
+                    name = "photo";
+                    break;
+                case 1:
+                    name = "folder";
+                    break;
+                case 2:
+                    name = "width";
+                    break;
+                case 3:
+                    name = "height";
+                    break;
+                default:
+                    name = QString("Col. %1").arg(section);
+                    break;
+            }
         } else {
-            name = "Row ";
+            // Create some artificial data
+            name = tr("%1").arg(section+1);
         }
 
-        // Create some artificial data
-        txt = tr("%1 %2").arg(name).arg(section+1);
-
         // Wrap in QVariant
-        data.setValue(txt);
+        data.setValue(name);
     }
 
     return data;
 }
+
+
